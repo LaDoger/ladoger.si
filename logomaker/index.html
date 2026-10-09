@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Strategy Logo Maker</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&family=Inter:wght@400&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Strategy Logo Maker">
+    <meta property="og:description" content="Strategy Logo Maker made by @LaDoger">
+    <meta property="og:type" content="gallery">
+    <meta property="og:url" content="https://ladoger.art/logomaker">
+    <meta property="og:image" content="https://ladoger.art/logomaker/logomaker.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="600">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Strategy Logo Maker">
+    <meta name="twitter:description" content="Strategy Logo Maker made by @LaDoger">
+    <meta name="twitter:image" content="https://ladoger.art/logomaker/logomaker.jpg">
+    <meta name="twitter:site" content="@LaDoger">
+
+    <style>
+        :root {
+            --input-height: 44px;
+            --input-border-width: 3px;
+            --input-padding: 10px; /* Padding inside the wrapper HORIZONTALLY */
+            --border-radius: 8px;
+            --standard-gap: 12px; /* Unified gap */
+            --emoji-button-font-size: 20px;
+            --emoji-button-edge-offset: 6px;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Lexend', sans-serif;
+            margin: 0;
+            padding: var(--standard-gap);
+            min-height: 100vh;
+            box-sizing: border-box;
+            background-color: #FFFFFF;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--standard-gap);
+            flex-grow: 1;
+        }
+
+        h2 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin: 0;
+            color: #FA660F;
+            letter-spacing: -0.1em;
+            padding-bottom: 5px;
+        }
+
+        /* Shared style for text-based input wrappers */
+        .text-input-wrapper,
+        .signature-input-wrapper,
+        .image-url-input-wrapper,
+        .color-picker-label,
+        .image-filter-wrapper { /* Added */
+            box-sizing: border-box;
+            border: var(--input-border-width) solid transparent;
+            border-radius: var(--border-radius);
+            background: linear-gradient(var(--bg-color, #FFFFFF), var(--bg-color, #FFFFFF)) padding-box,
+                        linear-gradient(to right, #FFB6C1, #FFDAB9, #FFDEAD, #E6E6FA, #B0E0E6, #98FB98, #D8BFD8) border-box;
+            animation: gradientShift 8s linear infinite;
+            background-size: 100% 100%, 200% 100%;
+            height: var(--input-height);
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--input-padding);
+        }
+
+        .text-input-wrapper { --bg-color: #FFFFFF; }
+        .signature-input-wrapper,
+        .image-url-input-wrapper,
+        .image-filter-wrapper { --bg-color: #f8f8f8; } /* Added */
+        .color-picker-label { padding: 0; }
+        .image-filter-wrapper { /* Specific styles for filter row */
+            justify-content: space-around; /* Distribute space */
+            padding: 0 calc(var(--input-padding) * 2); /* More internal padding */
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%, 0% 0%; }
+            100% { background-position: 0% 0%, 200% 0%; }
+        }
+
+        .text-input-wrapper,
+        .signature-input-wrapper,
+        .image-url-input-wrapper,
+        .image-filter-wrapper { /* Added */
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .text-input-wrapper input[type="text"]#wordInput,
+        .signature-input-wrapper input[type="text"]#signatureInput,
+        .image-url-input-wrapper input[type="text"]#bgImageUrlInput {
+            flex-grow: 1;
+            height: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: 'Lexend', sans-serif;
+            font-weight: 400;
+            text-align: center;
+            line-height: normal;
+            padding: 0;
+            width: 100%;
+        }
+
+        .signature-input-wrapper input[type="text"]#signatureInput,
+        .image-url-input-wrapper input[type="text"]#bgImageUrlInput {
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: #555;
+        }
+
+        .signature-input-wrapper input[type="text"]::placeholder,
+        .image-url-input-wrapper input[type="text"]::placeholder {
+            color: #aaa;
+        }
+
+        .emoji-button {
+            position: absolute;
+            right: var(--emoji-button-edge-offset);
+            top: 50%;
+            transform: translateY(-50%);
+            width: auto;
+            height: auto;
+            padding: 2px;
+            border: none;
+            background: transparent;
+            color: #555;
+            font-size: var(--emoji-button-font-size);
+            line-height: 1;
+            font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+            font-weight: normal;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .emoji-button:hover {
+           opacity: 0.7;
+        }
+
+        /* Hide signature, image URL, color options AND filters by default */
+        .signature-input-wrapper,
+        .image-url-input-wrapper,
+        .image-filter-wrapper, /* Added */
+        #colorOptionsContainer {
+            width: 100%;
+            max-width: 300px;
+            display: none; /* Initially hidden */
+        }
+
+        /* Show when .visible class is added */
+        .signature-input-wrapper.visible,
+        .image-url-input-wrapper.visible,
+        .image-filter-wrapper.visible, /* Added */
+        #colorOptionsContainer.visible {
+            display: flex;
+        }
+
+        /* Styles for the filter labels and checkboxes */
+        .image-filter-wrapper label {
+            display: inline-flex; /* Align text and checkbox */
+            align-items: center;
+            gap: 5px; /* Space between text and checkbox */
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+            user-select: none; /* Prevent text selection on click */
+        }
+
+        .image-filter-wrapper input[type="checkbox"] {
+            margin: 0;
+            cursor: pointer;
+             /* Optional: Style checkbox appearance */
+            width: 16px;
+            height: 16px;
+            accent-color: #FA660F; /* Match theme color */
+        }
+        /* --- END Hidden Options Section --- */
+
+        .color-picker-container {
+            /* Now targeted by ID for hiding/showing */
+            justify-content: center;
+            align-items: center;
+            gap: calc(var(--standard-gap) / 2);
+        }
+
+        .color-picker-label {
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: 0;
+            display: block;
+            min-width: 0;
+            height: var(--input-height);
+            position: relative;
+        }
+
+        .color-picker-label input[type="color"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .swap-color-btn {
+            position: static;
+            transform: none;
+            width: auto;
+            height: auto;
+            padding: 2px;
+            border: none;
+            background: transparent;
+            color: #555;
+            font-size: var(--emoji-button-font-size);
+            line-height: 1;
+            font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+            font-weight: normal;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .swap-color-btn:hover {
+            opacity: 0.7;
+        }
+
+        .canvas-row {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: var(--standard-gap);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        canvas {
+            width: 390px; /* Default desktop width */
+            height: auto; /* Maintain aspect ratio */
+            border: 1px solid #ccc;
+            display: block;
+        }
+
+        .transparent-bg {
+            /* This class now ONLY provides the visual checkerboard for the ELEMENT
+               if the canvas itself is drawn transparently (no color, no image bg) */
+            background-image: linear-gradient(45deg, #eee 25%, transparent 25%),
+                              linear-gradient(-45deg, #eee 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #eee 75%),
+                              linear-gradient(-45deg, transparent 75%, #eee 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 0;
+            margin-top: var(--standard-gap); /* Add some space before footer */
+            background-color: #FFFFFF;
+            font-weight: 400;
+        }
+
+        footer a {
+            color: #FA660F;
+            text-decoration: none;
+        }
+
+        footer a b {
+            font-weight: 700;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ----------- MOBILE STYLES ----------- */
+        @media (max-width: 600px) {
+            h2 {
+                font-size: 1.8em;
+                text-align: center;
+            }
+
+            .text-input-wrapper,
+            .signature-input-wrapper, /* Still apply max-width when visible */
+            .image-url-input-wrapper,
+            .image-filter-wrapper, /* Added */
+            #colorOptionsContainer { /* Still apply max-width when visible */
+                max-width: 100%;
+            }
+
+            /* Apply gap to the container only when visible */
+            #colorOptionsContainer.visible {
+                gap: 5px;
+            }
+
+            .color-picker-label {
+                flex-basis: auto;
+                flex-grow: 1;
+            }
+
+             :root {
+                 --emoji-button-font-size: 22px;
+                 --emoji-button-edge-offset: 8px;
+             }
+
+            .signature-input-wrapper input[type="text"]#signatureInput,
+            .image-url-input-wrapper input[type="text"]#bgImageUrlInput {
+                font-size: 16px;
+            }
+            .image-filter-wrapper label {
+                font-size: 16px; /* Match other inputs */
+            }
+             .image-filter-wrapper input[type="checkbox"] {
+                 width: 18px; /* Slightly larger on mobile */
+                 height: 18px;
+             }
+
+
+            .container {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: var(--standard-gap);
+            }
+
+            /* Set order for mobile layout */
+            h2 { order: 1; }
+            .text-input-wrapper { order: 2; }
+            /* Hidden elements still need order to maintain flow when shown */
+            .signature-input-wrapper { order: 3; }
+            .image-url-input-wrapper { order: 4; }
+            .image-filter-wrapper { order: 5; } /* NEW: Added filter row order */
+            #colorOptionsContainer { order: 6; } /* Adjusted order */
+
+            /* *** MODIFIED CANVAS ORDER for Mobile: Solid Backgrounds First *** */
+            #canvas1 { order: 7; }  /* Solid Color / Image */
+            #canvas2 { order: 8; }  /* Solid Color / Image */
+            #canvas3 { order: 9; }  /* Solid Color / Image */
+            #canvas7 { order: 10; }  /* Solid Color / Image */
+            #canvas8 { order: 11; } /* Solid Color / Image */
+            #canvas9 { order: 12; } /* Solid Color / Image */
+            #canvas4 { order: 13; } /* Transparent / Image */
+            #canvas5 { order: 14; } /* Transparent / Image */
+            #canvas6 { order: 15; } /* Transparent / Image */
+            #canvas10 { order: 16; }/* Transparent / Image */
+            #canvas11 { order: 17; }/* Transparent / Image */
+            #canvas12 { order: 18; }/* Transparent / Image */
+            /* *** END MODIFIED CANVAS ORDER *** */
+
+            footer { order: 99; }
+
+            /* Make canvas rows behave like grid items */
+            .canvas-row {
+                display: contents; /* Allows canvases inside to be direct grid children */
+            }
+
+            canvas {
+                width: 100% !important; /* Override inline style width */
+                max-width: 100%;
+                height: auto !important; /* Override inline style height */
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="mainContainer">
+        <h2>Strategy Logo Maker</h2>
+        <div class="text-input-wrapper">
+            <input type="text" id="wordInput" value="Strategy" placeholder="Enter text..." oninput="generateLogos()">
+            <button class="emoji-button" id="optionsToggleBtn" title="Show/Hide Options">🔽</button>
+        </div>
+
+        <!-- Starts hidden -->
+        <div class="signature-input-wrapper" id="signatureInputWrapper">
+            <input type="text" id="signatureInput" placeholder="Add signature..." oninput="generateLogos()">
+        </div>
+
+        <!-- Starts hidden -->
+        <div class="image-url-input-wrapper" id="bgImageUrlWrapper">
+             <input type="text" id="bgImageUrlInput" placeholder="Background: Paste image or image URL" oninput="handleBgImageInput()">
+        </div>
+
+        <!-- NEW: Image Filter Options (Starts hidden) -->
+        <div class="image-filter-wrapper" id="imageFilterWrapper">
+            <label for="grayscaleCheckbox">
+                <span>Grayscale</span>
+                <input type="checkbox" id="grayscaleCheckbox" name="imageFilter">
+            </label>
+            <label for="duotoneCheckbox">
+                <span>Duotone</span>
+                <input type="checkbox" id="duotoneCheckbox" name="imageFilter">
+            </label>
+        </div>
+
+        <!-- Starts hidden -->
+        <div class="color-picker-container" id="colorOptionsContainer">
+            <label class="color-picker-label" id="labelPicker1">
+                <input type="color" id="colorPicker1" value="#000000" title="Color 1 (Default Black)" oninput="handleColorInput(this)">
+            </label>
+            <button class="swap-color-btn" id="swapColor12Btn" title="Swap Color 1 and 2">🔄</button>
+            <label class="color-picker-label" id="labelPicker2">
+                <input type="color" id="colorPicker2" value="#FA660F" title="Color 2 (Default Orange)" oninput="handleColorInput(this)">
+            </label>
+            <button class="swap-color-btn" id="swapColor23Btn" title="Swap Color 2 and 3">🔄</button>
+            <label class="color-picker-label" id="labelPicker3">
+                <input type="color" id="colorPicker3" value="#FFFFFF" title="Color 3 (Default White)" oninput="handleColorInput(this)">
+            </label>
+        </div>
+
+        <!-- Canvas Structure Remains the Same -->
+        <div class="canvas-row">
+            <canvas id="canvas1" width="1280" height="720"></canvas>
+            <canvas id="canvas4" width="1280" height="720" class="transparent-bg"></canvas>
+        </div>
+        <div class="canvas-row">
+            <canvas id="canvas2" width="1280" height="720"></canvas>
+            <canvas id="canvas5" width="1280" height="720" class="transparent-bg"></canvas>
+        </div>
+        <div class="canvas-row">
+            <canvas id="canvas3" width="1280" height="720"></canvas>
+            <canvas id="canvas6" width="1280" height="720" class="transparent-bg"></canvas>
+        </div>
+        <div class="canvas-row">
+            <canvas id="canvas7" width="1280" height="1280"></canvas>
+            <canvas id="canvas10" width="1280" height="1280" class="transparent-bg"></canvas>
+        </div>
+        <div class="canvas-row">
+            <canvas id="canvas8" width="1280" height="1280"></canvas>
+            <canvas id="canvas11" width="1280" height="1280" class="transparent-bg"></canvas>
+        </div>
+        <div class="canvas-row">
+            <canvas id="canvas9" width="1280" height="1280"></canvas>
+            <canvas id="canvas12" width="1280" height="1280" class="transparent-bg"></canvas>
+        </div>
+        <footer>Made by <a href="https://x.com/LaDoger"><b>@LaDoger</b></a> with 🧡</footer>
+    </div>
+
+<script>
+    const COLOR_ROLE_1 = 'color1';
+    const COLOR_ROLE_2 = 'color2';
+    const COLOR_ROLE_3 = 'color3';
+
+    const canvases = [
+        // Row 1
+        { id: 'canvas1', textColorRole: COLOR_ROLE_1, bgColorRole: COLOR_ROLE_2, isOriginallyTransparent: false },
+        { id: 'canvas4', textColorRole: COLOR_ROLE_1, bgColorRole: 'transparent', isOriginallyTransparent: true },
+        // Row 2
+        { id: 'canvas2', textColorRole: COLOR_ROLE_2, bgColorRole: COLOR_ROLE_3, isOriginallyTransparent: false },
+        { id: 'canvas5', textColorRole: COLOR_ROLE_2, bgColorRole: 'transparent', isOriginallyTransparent: true },
+        // Row 3
+        { id: 'canvas3', textColorRole: COLOR_ROLE_3, bgColorRole: COLOR_ROLE_1, isOriginallyTransparent: false },
+        { id: 'canvas6', textColorRole: COLOR_ROLE_3, bgColorRole: 'transparent', isOriginallyTransparent: true },
+        // Row 4 (Square)
+        { id: 'canvas7', textColorRole: COLOR_ROLE_1, bgColorRole: COLOR_ROLE_2, isOriginallyTransparent: false },
+        { id: 'canvas10', textColorRole: COLOR_ROLE_1, bgColorRole: 'transparent', isOriginallyTransparent: true },
+        // Row 5 (Square)
+        { id: 'canvas8', textColorRole: COLOR_ROLE_2, bgColorRole: COLOR_ROLE_3, isOriginallyTransparent: false },
+        { id: 'canvas11', textColorRole: COLOR_ROLE_2, bgColorRole: 'transparent', isOriginallyTransparent: true },
+        // Row 6 (Square)
+        { id: 'canvas9', textColorRole: COLOR_ROLE_3, bgColorRole: COLOR_ROLE_1, isOriginallyTransparent: false },
+        { id: 'canvas12', textColorRole: COLOR_ROLE_3, bgColorRole: 'transparent', isOriginallyTransparent: true }
+    ];
+
+    const symbolImg = new Image();
+    symbolImg.src = 'symbol.png';
+    let symbolLoaded = false;
+    symbolImg.onload = () => {
+        symbolLoaded = true;
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                if (window.initialDrawTriggered) generateLogos();
+        }
+    };
+    symbolImg.onerror = () => console.error("Failed to load symbol.png");
+
+    // --- Offscreen Canvases for Filtering ---
+    const offscreenCanvas = document.createElement('canvas'); // For symbol colorizing
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+    const filterCanvas = document.createElement('canvas'); // For image filtering (source)
+    const filterCtx = filterCanvas.getContext('2d', { willReadFrequently: true }); // Source for ImageData
+    // ---
+
+    const isMobile = () => window.innerWidth <= 600;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const BASE_SYMBOL_DOWNWARD_SHIFT_FACTOR = 0.08;
+    const IOS_SYMBOL_DOWNWARD_SHIFT_FACTOR = 0.13;
+    const IOS_VERTICAL_OFFSET_FACTOR = -0.04; // NEW: Adjust this negative value to shift UP on iOS (-0.025 = 2.5% up)
+
+    const mainContainer = document.getElementById('mainContainer');
+    window.initialDrawTriggered = false; // Flag to see if a draw was attempted before symbol loaded
+
+    // --- Options Elements ---
+    const optionsToggleBtn = document.getElementById('optionsToggleBtn');
+    const signatureInputWrapper = document.getElementById('signatureInputWrapper');
+    const signatureInput = document.getElementById('signatureInput');
+    const bgImageUrlWrapper = document.getElementById('bgImageUrlWrapper');
+    const bgImageUrlInput = document.getElementById('bgImageUrlInput');
+    const colorOptionsContainer = document.getElementById('colorOptionsContainer');
+    const imageFilterWrapper = document.getElementById('imageFilterWrapper'); // NEW
+    const grayscaleCheckbox = document.getElementById('grayscaleCheckbox'); // NEW
+    const duotoneCheckbox = document.getElementById('duotoneCheckbox');   // NEW
+    let isOptionsVisible = false; // Controls visibility of ALL options
+    // --- END Options Elements ---
+
+    // --- Background Image State ---
+    let backgroundImageObject = null; // Will hold the loaded Image object
+    let currentBackgroundImageUrl = ''; // Stores the URL currently being used/loaded OR a data URL from paste
+    let isPastedImage = false; // Flag to indicate if the current background is from paste
+    // --- END Background Image State ---
+
+    // --- Filter State ---
+    let isGrayscaleEnabled = false; // NEW
+    let isDuotoneEnabled = false;   // NEW
+    // --- END Filter State ---
+
+    const colorPicker1 = document.getElementById('colorPicker1');
+    const colorPicker2 = document.getElementById('colorPicker2');
+    const colorPicker3 = document.getElementById('colorPicker3');
+
+    // --- Helper Functions ---
+    function checkIOSVersionAndWarn() {
+        const userAgent = navigator.userAgent;
+        if (isIOS) {
+            const match = userAgent.match(/OS (\d+)_(\d+)(?:_(\d+))? like Mac OS X/);
+            if (match && match[1] && match[2]) {
+                const majorVer = parseInt(match[1], 10);
+                const minorVer = parseInt(match[2], 10);
+                if (!isNaN(majorVer) && !isNaN(minorVer)) {
+                    if (majorVer < 18 || (majorVer === 18 && minorVer < 4)) {
+                        // Alert removed as it was annoying, just log warning
+                        console.warn("Older iOS version detected (pre-18.4). Logo rendering might have minor differences.");
+                    }
+                } else {
+                    console.warn("Could not parse iOS version numbers from User Agent:", userAgent);
+                }
+            } else {
+                console.warn("Could not find iOS version pattern in User Agent:", userAgent);
+            }
+        }
+    }
+
+    function getSelectedColors() {
+        return {
+            [COLOR_ROLE_1]: colorPicker1.value,
+            [COLOR_ROLE_2]: colorPicker2.value,
+            [COLOR_ROLE_3]: colorPicker3.value
+        };
+    }
+
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function lerp(a, b, amount) {
+        const t = Math.max(0, Math.min(1, amount));
+        return a + (b - a) * t;
+    }
+    // --- End Helper Functions ---
+
+    function drawColorizedSymbol(mainCtx, targetColor, symbolX, symbolY, symbolWidth, symbolHeight) {
+        if (!symbolLoaded || symbolWidth <= 0 || symbolHeight <= 0) return;
+        try {
+            const osWidth = Math.max(1, Math.round(symbolWidth));
+            const osHeight = Math.max(1, Math.round(symbolHeight));
+            offscreenCanvas.width = osWidth;
+            offscreenCanvas.height = osHeight;
+
+            offscreenCtx.clearRect(0, 0, osWidth, osHeight);
+            offscreenCtx.drawImage(symbolImg, 0, 0, osWidth, osHeight);
+            offscreenCtx.globalCompositeOperation = 'source-in';
+            offscreenCtx.fillStyle = targetColor;
+            offscreenCtx.fillRect(0, 0, osWidth, osHeight);
+            offscreenCtx.globalCompositeOperation = 'source-over';
+            mainCtx.drawImage(offscreenCanvas, symbolX, symbolY, symbolWidth, symbolHeight);
+        } catch (e) {
+            console.error("Error drawing symbol:", e);
+            offscreenCtx.globalCompositeOperation = 'source-over'; // Reset in case of error
+        }
+    }
+
+    function updatePickerBackgrounds() {
+        if (colorOptionsContainer) {
+            document.getElementById('labelPicker1').style.setProperty('--bg-color', colorPicker1.value);
+            document.getElementById('labelPicker2').style.setProperty('--bg-color', colorPicker2.value);
+            document.getElementById('labelPicker3').style.setProperty('--bg-color', colorPicker3.value);
+        }
+    }
+
+    function handleColorInput(inputElement) {
+        updatePickerBackgrounds();
+        generateLogos();
+    }
+
+    function handleFilterChange(changedCheckbox) {
+        if (changedCheckbox === grayscaleCheckbox && grayscaleCheckbox.checked) {
+            duotoneCheckbox.checked = false; // Uncheck the other
+            isGrayscaleEnabled = true;
+            isDuotoneEnabled = false;
+        } else if (changedCheckbox === duotoneCheckbox && duotoneCheckbox.checked) {
+            grayscaleCheckbox.checked = false; // Uncheck the other
+            isGrayscaleEnabled = false;
+            isDuotoneEnabled = true;
+        } else {
+            // If the currently checked box was unchecked
+            isGrayscaleEnabled = grayscaleCheckbox.checked;
+            isDuotoneEnabled = duotoneCheckbox.checked;
+        }
+        generateLogos(); // Redraw with new filter state
+    }
+
+    function loadImageAndUpdate(imageUrl) {
+         isPastedImage = imageUrl.startsWith('data:image/'); // Check if it's a data URL (pasted)
+
+         if (imageUrl === currentBackgroundImageUrl) {
+             return; // No change, do nothing
+         }
+
+         currentBackgroundImageUrl = imageUrl; // Update the current URL/data state
+
+         // Hide filter options initially until image loads
+         imageFilterWrapper.classList.remove('visible');
+         grayscaleCheckbox.checked = false;
+         duotoneCheckbox.checked = false;
+         isGrayscaleEnabled = false;
+         isDuotoneEnabled = false;
+
+         if (currentBackgroundImageUrl) {
+             // If there's a new URL or data URL, create a new image object and start loading
+             console.log("Attempting to load background image:", isPastedImage ? "[Pasted Image]" : currentBackgroundImageUrl);
+             backgroundImageObject = new Image();
+
+             if (!isPastedImage) {
+                 backgroundImageObject.crossOrigin = "Anonymous";
+             }
+
+             backgroundImageObject.onload = () => {
+                 console.log("Background image loaded successfully:", isPastedImage ? "[Pasted Image]" : currentBackgroundImageUrl);
+                 if (!isPastedImage) {
+                     bgImageUrlInput.value = currentBackgroundImageUrl;
+                 }
+                 // Show filter options ONLY if the main options toggle is also visible
+                 if (isOptionsVisible) {
+                    imageFilterWrapper.classList.add('visible');
+                 }
+                 generateLogos(); // Redraw all logos now that the image is ready
+             };
+             backgroundImageObject.onerror = (err) => {
+                 console.error("Failed to load background image:", isPastedImage ? "[Pasted Image]" : currentBackgroundImageUrl, err);
+                 backgroundImageObject = null; // Reset on error
+                 currentBackgroundImageUrl = ''; // Clear the failed URL state
+                 bgImageUrlInput.value = ''; // Clear the input field
+                 isPastedImage = false;
+                 imageFilterWrapper.classList.remove('visible'); // Hide filters on error
+                 grayscaleCheckbox.checked = false;
+                 duotoneCheckbox.checked = false;
+                 isGrayscaleEnabled = false;
+                 isDuotoneEnabled = false;
+                 generateLogos(); // Redraw with color backgrounds
+             };
+             backgroundImageObject.src = currentBackgroundImageUrl;
+         } else {
+             // If the URL/data was cleared, reset the image object
+             backgroundImageObject = null;
+             isPastedImage = false;
+             imageFilterWrapper.classList.remove('visible'); // Hide filters if input cleared
+             grayscaleCheckbox.checked = false;
+             duotoneCheckbox.checked = false;
+             isGrayscaleEnabled = false;
+             isDuotoneEnabled = false;
+             // Trigger redraw to revert to color backgrounds
+             generateLogos();
+         }
+    }
+
+    function handleBgImageInput() {
+        const newUrl = bgImageUrlInput.value.trim();
+        if (!newUrl.startsWith('data:image/')) {
+             loadImageAndUpdate(newUrl);
+        } else if (!newUrl) {
+             loadImageAndUpdate('');
+        }
+    }
+
+    function handleImagePaste(event) {
+        const clipboardData = event.clipboardData || window.clipboardData;
+        if (!clipboardData) {
+             console.log("Clipboard data not accessible.");
+             return;
+        }
+
+        const items = clipboardData.items;
+        let imageFound = false;
+
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
+                event.preventDefault();
+                imageFound = true;
+                const imageFile = items[i].getAsFile();
+
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        console.log("Image pasted successfully.");
+                        bgImageUrlInput.value = '[Pasted Image]';
+                        loadImageAndUpdate(e.target.result);
+                    }
+                    reader.onerror = function(e) {
+                        console.error("Error reading pasted image file:", e);
+                         bgImageUrlInput.value = '';
+                         loadImageAndUpdate('');
+                    }
+                    reader.readAsDataURL(imageFile);
+                }
+                break;
+            }
+        }
+         if (!imageFound) {
+            console.log("No image found in paste items.");
+         }
+    }
+
+    function toggleOptionsVisibility() {
+        isOptionsVisible = !isOptionsVisible;
+
+        signatureInputWrapper.classList.toggle('visible', isOptionsVisible);
+        bgImageUrlWrapper.classList.toggle('visible', isOptionsVisible);
+        colorOptionsContainer.classList.toggle('visible', isOptionsVisible);
+
+        const showFilters = isOptionsVisible && backgroundImageObject && backgroundImageObject.complete && backgroundImageObject.naturalWidth > 0;
+        imageFilterWrapper.classList.toggle('visible', showFilters);
+
+        optionsToggleBtn.textContent = isOptionsVisible ? '🔼' : '🔽';
+
+        if (!isOptionsVisible) {
+            grayscaleCheckbox.checked = false;
+            duotoneCheckbox.checked = false;
+            isGrayscaleEnabled = false;
+            isDuotoneEnabled = false;
+        }
+
+        generateLogos();
+    }
+
+    function swapColors12() {
+        const tempColor = colorPicker1.value;
+        colorPicker1.value = colorPicker2.value;
+        colorPicker2.value = tempColor;
+        updatePickerBackgrounds();
+        generateLogos();
+    }
+
+    function swapColors23() {
+        const tempColor = colorPicker2.value;
+        colorPicker2.value = colorPicker3.value;
+        colorPicker3.value = tempColor;
+        updatePickerBackgrounds();
+        generateLogos();
+    }
+
+    function drawBackgroundImageCover(ctx, img) {
+        const canvas = ctx.canvas;
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const imgWidth = img.naturalWidth || img.width;
+        const imgHeight = img.naturalHeight || img.height;
+
+        if (!imgWidth || !imgHeight) return;
+
+        const canvasRatio = canvasWidth / canvasHeight;
+        const imgRatio = imgWidth / imgHeight;
+        let drawWidth, drawHeight, drawX, drawY;
+
+        if (imgRatio > canvasRatio) {
+            drawHeight = canvasHeight;
+            drawWidth = imgRatio * drawHeight;
+            drawX = (canvasWidth - drawWidth) / 2;
+            drawY = 0;
+        } else {
+            drawWidth = canvasWidth;
+            drawHeight = drawWidth / imgRatio;
+            drawX = 0;
+            drawY = (canvasHeight - drawHeight) / 2;
+        }
+
+        try {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+        } catch (e) {
+            console.error("Error drawing background image:", e);
+        }
+    }
+
+    // --- REVISED: Function to apply grayscale filter using ImageData ---
+    function applyGrayscaleFilter(targetCtx, img) {
+        const canvasWidth = targetCtx.canvas.width;
+        const canvasHeight = targetCtx.canvas.height;
+
+        // 1. Draw original image onto filter canvas to get pixel data
+        filterCanvas.width = canvasWidth;
+        filterCanvas.height = canvasHeight;
+        filterCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        drawBackgroundImageCover(filterCtx, img); // Draw source image scaled/cropped
+
+        try {
+            // 2. Get image data
+            const imageData = filterCtx.getImageData(0, 0, canvasWidth, canvasHeight);
+            const data = imageData.data;
+
+            // 3. Iterate through pixels and apply grayscale logic
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                // Calculate luminosity (standard formula)
+                const gray = Math.round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+
+                // Set R, G, and B to the calculated gray value
+                data[i] = gray;
+                data[i + 1] = gray;
+                data[i + 2] = gray;
+                // Keep original alpha: data[i + 3] = alpha;
+            }
+
+            // 4. Put the modified image data back onto the *target* canvas
+            targetCtx.putImageData(imageData, 0, 0);
+
+        } catch (e) {
+            console.error("Error processing image data for grayscale:", e);
+            drawBackgroundImageCover(targetCtx, img); // Fallback to original image
+        }
+    }
+    // --- END REVISED Function ---
+
+    // Function to apply duotone filter using ImageData
+    function applyDuotoneFilter(targetCtx, img, colorDarkHex, colorLightHex) {
+        const canvasWidth = targetCtx.canvas.width;
+        const canvasHeight = targetCtx.canvas.height;
+
+        const colorDark = hexToRgb(colorDarkHex);
+        const colorLight = hexToRgb(colorLightHex);
+
+        if (!colorDark || !colorLight) {
+            console.error("Invalid duotone colors provided:", colorDarkHex, colorLightHex);
+            drawBackgroundImageCover(targetCtx, img);
+            return;
+        }
+
+        filterCanvas.width = canvasWidth;
+        filterCanvas.height = canvasHeight;
+        filterCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        drawBackgroundImageCover(filterCtx, img);
+
+        try {
+            const imageData = filterCtx.getImageData(0, 0, canvasWidth, canvasHeight);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                const luminosity = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0;
+
+                const newR = Math.round(lerp(colorDark.r, colorLight.r, luminosity));
+                const newG = Math.round(lerp(colorDark.g, colorLight.g, luminosity));
+                const newB = Math.round(lerp(colorDark.b, colorLight.b, luminosity));
+
+                data[i] = newR;
+                data[i + 1] = newG;
+                data[i + 2] = newB;
+            }
+            targetCtx.putImageData(imageData, 0, 0);
+
+        } catch (e) {
+            console.error("Error processing image data for duotone:", e);
+            drawBackgroundImageCover(targetCtx, img);
+        }
+    }
+
+
+    function generateLogos() {
+        if (!symbolLoaded && (!symbolImg.complete || symbolImg.naturalWidth === 0)) {
+            console.log("Symbol not loaded yet, queuing draw.");
+            window.initialDrawTriggered = true;
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            const input = document.getElementById('wordInput').value;
+            const word = input ? input + "  " : "";
+            const selectedColors = getSelectedColors();
+            const signatureText = isOptionsVisible ? signatureInput.value.trim() : '';
+            const useImageBackground = isOptionsVisible && backgroundImageObject && backgroundImageObject.complete && backgroundImageObject.naturalWidth > 0;
+
+            canvases.forEach(canvasInfo => {
+                const canvas = document.getElementById(canvasInfo.id);
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const textColor = selectedColors[canvasInfo.textColorRole];
+                const designatedBgColor = canvasInfo.bgColorRole === 'transparent' ? 'transparent' : selectedColors[canvasInfo.bgColorRole];
+                const isDesignatedSolid = designatedBgColor !== 'transparent';
+
+                const originalCompositeOp = ctx.globalCompositeOperation;
+                const originalFilter = ctx.filter;
+                const originalSmoothing = ctx.imageSmoothingEnabled;
+                const originalSmoothingQuality = ctx.imageSmoothingQuality;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 2. Draw Background
+                let actualBgIsImage = false;
+                if (useImageBackground) {
+                    if (isGrayscaleEnabled) {
+                        applyGrayscaleFilter(ctx, backgroundImageObject);
+                        actualBgIsImage = true;
+                    } else if (isDuotoneEnabled) {
+                        let duotoneColor1Hex, duotoneColor2Hex;
+                        if (canvasInfo.textColorRole === COLOR_ROLE_1) {
+                            duotoneColor1Hex = selectedColors[COLOR_ROLE_2];
+                            duotoneColor2Hex = selectedColors[COLOR_ROLE_3];
+                        } else if (canvasInfo.textColorRole === COLOR_ROLE_2) {
+                            duotoneColor1Hex = selectedColors[COLOR_ROLE_1];
+                            duotoneColor2Hex = selectedColors[COLOR_ROLE_3];
+                        } else {
+                            duotoneColor1Hex = selectedColors[COLOR_ROLE_1];
+                            duotoneColor2Hex = selectedColors[COLOR_ROLE_2];
+                        }
+                        applyDuotoneFilter(ctx, backgroundImageObject, duotoneColor1Hex, duotoneColor2Hex);
+                        actualBgIsImage = true;
+                    } else {
+                        drawBackgroundImageCover(ctx, backgroundImageObject);
+                        actualBgIsImage = true;
+                    }
+                }
+
+                if (!actualBgIsImage) {
+                    if (isDesignatedSolid) {
+                        ctx.fillStyle = designatedBgColor;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        canvas.classList.remove('transparent-bg');
+                    } else {
+                        canvas.classList.add('transparent-bg');
+                    }
+                } else {
+                     canvas.classList.remove('transparent-bg');
+                }
+
+
+                // 3. Draw main text and symbol (if word exists)
+                if (word) {
+                    const maxWidth = canvas.width * 0.9;
+                    const maxHeight = canvas.height * 0.8;
+                    let fontSize = Math.min(canvas.width / 5, canvas.height / 1.5);
+                    let metrics, textWidth, textHeight;
+                    let iterations = 0;
+                    const maxIterations = 50;
+
+                    const setFontAndMeasure = (size) => {
+                        ctx.font = `bold ${size}px Lexend`;
+                        ctx.letterSpacing = `${size * -0.1}px`;
+                        metrics = ctx.measureText(word);
+                        textHeight = (metrics.actualBoundingBoxAscent || size * 0.8) + (metrics.actualBoundingBoxDescent || size * 0.2);
+                        textWidth = metrics.width;
+                    };
+
+                    setFontAndMeasure(fontSize);
+
+                    while ((textWidth > maxWidth || textHeight > maxHeight) && fontSize > 10 && iterations < maxIterations) {
+                        fontSize *= Math.min(maxWidth / textWidth, maxHeight / textHeight) * 0.98;
+                        fontSize = Math.max(fontSize, 10);
+                        setFontAndMeasure(fontSize);
+                        iterations++;
+                    }
+                    iterations = 0;
+                    while (textWidth < maxWidth * 0.7 && textHeight < maxHeight * 0.7 && fontSize < Math.min(canvas.width, canvas.height) * 0.8 && iterations < maxIterations) {
+                        let scaleFactor = Math.min(maxWidth / textWidth, maxHeight / textHeight);
+                         if (scaleFactor < 1.05) break;
+                        fontSize *= Math.min(scaleFactor, 1.02);
+                        setFontAndMeasure(fontSize);
+                        iterations++;
+                    }
+                     if (textWidth > maxWidth || textHeight > maxHeight) {
+                        fontSize *= Math.min(maxWidth / textWidth, maxHeight / textHeight);
+                        setFontAndMeasure(fontSize);
+                    }
+
+                    // Draw Text
+                    ctx.fillStyle = textColor;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    // ****** MODIFICATION FOR iOS VERTICAL POSITIONING ******
+                    const baseTextY = canvas.height / 2;
+                    const iosVerticalOffset = isIOS ? canvas.height * IOS_VERTICAL_OFFSET_FACTOR : 0;
+                    const textY = baseTextY + iosVerticalOffset;
+                    // ****** END MODIFICATION ******
+
+                    ctx.font = `bold ${fontSize}px Lexend`;
+                    ctx.letterSpacing = `${fontSize * -0.1}px`;
+                    const inputMetrics = ctx.measureText(input); // Measure without trailing spaces
+                    const inputActualWidth = inputMetrics.width;
+                    ctx.fillText(word, canvas.width / 2, textY); // Draw with spaces
+
+                    // Calculate Symbol Position and Size
+                    const symbolHeight = fontSize * 0.6;
+                    const symbolAspectRatio = symbolImg.naturalWidth / symbolImg.naturalHeight || (534 / 889);
+                    const symbolWidth = symbolHeight * symbolAspectRatio;
+                    const symbolX = (canvas.width / 2) + (inputActualWidth / 2) - (fontSize * 0.1);
+                    // Note: The symbol Y position is relative to the calculated textY, so it will shift up/down with the text automatically
+                    const downwardShiftFactor = isIOS ? IOS_SYMBOL_DOWNWARD_SHIFT_FACTOR : BASE_SYMBOL_DOWNWARD_SHIFT_FACTOR;
+                    const symbolBottomY = textY + (fontSize * downwardShiftFactor);
+                    const symbolY = symbolBottomY - symbolHeight;
+
+                    // Draw Symbol if loaded
+                    if (symbolLoaded) {
+                        drawColorizedSymbol(ctx, textColor, symbolX, symbolY, symbolWidth, symbolHeight);
+                    }
+                }
+
+                // 4. Draw Signature if text exists (requires options to be visible)
+                if (signatureText) {
+                    ctx.fillStyle = textColor;
+                    ctx.font = '400 40px Inter';
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'bottom';
+                    ctx.letterSpacing = '0px'; // Reset letter spacing for signature
+                    const padding = 30;
+                    const sigX = canvas.width - padding;
+                    const sigY = canvas.height - padding;
+                    ctx.fillText(signatureText, sigX, sigY);
+                }
+
+                // Restore original context settings
+                ctx.globalCompositeOperation = originalCompositeOp;
+                ctx.filter = originalFilter; // Reset just in case
+                ctx.imageSmoothingEnabled = originalSmoothing;
+                ctx.imageSmoothingQuality = originalSmoothingQuality;
+                ctx.letterSpacing = '0px';
+            });
+        });
+    }
+
+    function setupCanvasClickEvents() {
+        canvases.forEach(canvasInfo => {
+            const canvas = document.getElementById(canvasInfo.id);
+            if (!canvas) return;
+            canvas.onclick = null; // Remove previous listener
+
+            if (isMobile()) {
+                canvas.style.cursor = 'pointer';
+                canvas.onclick = () => {
+                    try {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        const word = document.getElementById('wordInput').value.trim().replace(/[^a-z0-9]/gi, '-') || 'Logo';
+                        const aspectRatio = canvas.width === canvas.height ? 'SQ' : '16x9';
+                        const selectedColors = getSelectedColors();
+                        const textColor = selectedColors[canvasInfo.textColorRole];
+                        let bgDesc;
+                        let filterDesc = '';
+
+                        const useImageBackground = isOptionsVisible && backgroundImageObject && backgroundImageObject.complete && backgroundImageObject.naturalWidth > 0;
+
+                        if (useImageBackground) {
+                            bgDesc = 'img';
+                            if (isGrayscaleEnabled) {
+                                filterDesc = '_gray';
+                            } else if (isDuotoneEnabled) {
+                                filterDesc = '_duo';
+                            }
+                        } else {
+                             const designatedBgColor = canvasInfo.bgColorRole === 'transparent' ? 'transparent' : selectedColors[canvasInfo.bgColorRole];
+                             bgDesc = designatedBgColor === 'transparent' ? 'transp' : designatedBgColor.replace('#', '');
+                        }
+
+                        const sigText = isOptionsVisible ? signatureInput.value.trim() : '';
+                        const sigPart = sigText ? `_sig-${sigText.replace(/[^a-z0-9]/gi, '')}` : '';
+                        const cleanTextColor = textColor.replace('#', '');
+
+                        const filename = `${word}_${cleanTextColor}-on-${bgDesc}${filterDesc}_${aspectRatio}${sigPart}.png`;
+
+
+                        // iOS Share API / Fallback Logic
+                        if (isIOS && navigator.share) {
+                            fetch(dataUrl)
+                                .then(res => res.blob())
+                                .then(blob => {
+                                    if (!blob) throw new Error("Blob creation failed");
+                                    const file = new File([blob], filename, { type: 'image/png' });
+                                    if (!navigator.canShare || !navigator.canShare({ files: [file] })) {
+                                            console.warn("Sharing PNG files might not be supported by the browser/OS, falling back to opening image.");
+                                            window.open(dataUrl, '_blank');
+                                            return;
+                                    }
+                                    navigator.share({ files: [file], title: filename })
+                                    .catch(error => {
+                                        if (error.name !== 'AbortError') {
+                                            console.error('Share API failed:', error);
+                                            window.open(dataUrl, '_blank');
+                                        } else { console.log('Share action cancelled by user.'); }
+                                    });
+                                })
+                                .catch(error => {
+                                    console.error('Fetch/Blob/Share Setup failed:', error);
+                                    window.open(dataUrl, '_blank');
+                                });
+                        } else if (isIOS) {
+                            window.open(dataUrl, '_blank');
+                        } else {
+                            const link = document.createElement('a');
+                            link.download = filename;
+                            link.href = dataUrl;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
+                    } catch (e) {
+                        console.error("Error generating or downloading canvas image:", e);
+                        alert("Could not generate download link. Your browser might not support this feature or the canvas is empty.");
+                    }
+                };
+            } else {
+                canvas.style.cursor = '';
+            }
+        });
+    }
+
+    function resizeHandler() {
+        const container = mainContainer;
+        const totalWidth = Math.min(800, container.clientWidth); // Max width constraint
+        const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--standard-gap')) || 12;
+        const smallScreen = isMobile();
+
+        canvases.forEach(canvasInfo => {
+            const canvas = document.getElementById(canvasInfo.id);
+            if (!canvas) return;
+
+            let canvasContainerWidth;
+                if (smallScreen) {
+                    canvasContainerWidth = container.clientWidth;
+                } else {
+                    canvasContainerWidth = (totalWidth - gap) / 2;
+                }
+
+            const displayWidth = Math.max(10, Math.floor(canvasContainerWidth));
+            const nativeRatio = canvas.height / canvas.width;
+            const displayHeight = Math.floor(displayWidth * nativeRatio);
+
+            canvas.style.width = `${displayWidth}px`;
+            canvas.style.height = `${displayHeight}px`;
+        });
+
+        generateLogos();
+        setupCanvasClickEvents();
+    }
+
+    window.addEventListener('load', () => {
+            checkIOSVersionAndWarn();
+
+            if (symbolImg.complete && symbolImg.naturalWidth > 0) {
+                symbolLoaded = true;
+            }
+            updatePickerBackgrounds();
+            resizeHandler(); // Initial resize, layout, and logo generation
+
+            // Attach listeners
+            optionsToggleBtn.addEventListener('click', toggleOptionsVisibility);
+            const swapBtn12 = document.getElementById('swapColor12Btn');
+            const swapBtn23 = document.getElementById('swapColor23Btn');
+            if (swapBtn12) swapBtn12.addEventListener('click', swapColors12);
+            if (swapBtn23) swapBtn23.addEventListener('click', swapColors23);
+
+            if (bgImageUrlInput) {
+                bgImageUrlInput.addEventListener('paste', handleImagePaste);
+            }
+
+            if (grayscaleCheckbox) {
+                grayscaleCheckbox.addEventListener('change', () => handleFilterChange(grayscaleCheckbox));
+            }
+            if (duotoneCheckbox) {
+                duotoneCheckbox.addEventListener('change', () => handleFilterChange(duotoneCheckbox));
+            }
+
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    resizeHandler();
+                }, 150);
+            });
+
+            setTimeout(() => {
+                if (!symbolLoaded) {
+                    console.warn("Symbol image load timeout. Assuming loaded or failed, attempting draw if queued.");
+                    symbolLoaded = true; // Assume loaded to prevent blocking indefinitely
+                    if(window.initialDrawTriggered) generateLogos();
+                }
+            }, 3000);
+
+            if (window.initialDrawTriggered && symbolLoaded) {
+                console.log("Symbol was ready, drawing queued request.");
+                generateLogos();
+            }
+    });
+
+</script>
+</body>
+</html>
