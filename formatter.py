@@ -1,3 +1,4 @@
+# DEPRECATED: re-saves and renames EVERY image in images/ (changes hashes). Use add_media.py instead.
 import os
 import hashlib
 import subprocess
