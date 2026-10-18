@@ -1,0 +1,18 @@
+# Media lives in Cloudflare R2 (bucket ladoger-art-media, served at https://media.ladoger.art).
+# Never commit it here; add_media.py uploads it. Only the list files (images.txt, pinned.txt) are committed.
+images/
+refs/
+v1/**/*.jpg
+v1/**/*.jpeg
+v1/**/*.png
+v1/**/*.mp4
+v1/**/*.webp
+!v1/1200-600.jpg
+!v1/logomaker/
+!v1/logomaker/**
+*.mp4
+*.mov
+*.webm
+*.mp3
+.DS_Store
+__pycache__/

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Manhattan</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const aspect = window.innerWidth / window.innerHeight;
+        const camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 2000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Dynamic camera position based on aspect ratio
+        function updateCamera() {
+            const aspect = window.innerWidth / window.innerHeight;
+            camera.aspect = aspect;
+            if (aspect < 1) { // Portrait mode
+                camera.position.z = 45; // Zoom out for mobile
+            } else { // Landscape mode
+                camera.position.z = 30; // Default for desktop
+            }
+            camera.updateProjectionMatrix();
+        }
+        updateCamera(); // Initial call
+
+        // Group for cube and stars
+        const rotationGroup = new THREE.Group();
+        scene.add(rotationGroup);
+
+        // Cube of cubes parameters
+        const cubeSize = 21;
+        const cubeWidth = 0.5;
+        const spacing = cubeWidth;
+        const instanceCount = cubeSize * cubeSize * cubeSize;
+
+        // Define 6 random yellow-to-orange colors once
+        const colors = [];
+        for (let i = 0; i < 6; i++) {
+            const hue = 30 + Math.random() * 30;
+            colors.push(new THREE.Color(`hsl(${hue}, 100%, 50%)`));
+        }
+
+        // Single cube geometry
+        const geometry = new THREE.BoxGeometry(cubeWidth, cubeWidth, cubeWidth);
+
+        // Materials for 6 faces
+        const materials = colors.map(color => new THREE.MeshLambertMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: 0.8
+        }));
+
+        // Instanced mesh for all small cubes
+        const instancedCube = new THREE.InstancedMesh(geometry, materials, instanceCount);
+        const dummy = new THREE.Object3D();
+        const cubePositions = [];
+
+        // Position and randomly rotate each instance
+        let index = 0;
+        const angles = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
+        for (let x = 0; x < cubeSize; x++) {
+            for (let y = 0; y < cubeSize; y++) {
+                for (let z = 0; z < cubeSize; z++) {
+                    const pos = new THREE.Vector3(
+                        (x - cubeSize / 2) * (cubeWidth + spacing),
+                        (y - cubeSize / 2) * (cubeWidth + spacing),
+                        (z - cubeSize / 2) * (cubeWidth + spacing)
+                    );
+                    dummy.position.copy(pos);
+                    dummy.rotation.set(
+                        angles[Math.floor(Math.random() * 4)],
+                        angles[Math.floor(Math.random() * 4)],
+                        angles[Math.floor(Math.random() * 4)]
+                    );
+                    dummy.updateMatrix();
+                    instancedCube.setMatrixAt(index++, dummy.matrix);
+                    cubePositions.push({ x, y, z, pos: pos.clone() });
+                }
+            }
+        }
+        rotationGroup.add(instancedCube);
+
+        // Point light
+        const light = new THREE.PointLight(0xffcc00, 1.5, 50);
+        light.position.set(0, 0, 0);
+        rotationGroup.add(light);
+
+        // Starry background (dots)
+        const starGeometry = new THREE.BufferGeometry();
+        const starCount = 5000;
+        const starPositions = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount * 3; i += 3) {
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+            const radius = 100 + Math.random() * 400;
+            starPositions[i] = radius * Math.sin(phi) * Math.cos(theta);
+            starPositions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+            starPositions[i + 2] = radius * Math.cos(phi);
+        }
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        const starMaterial = new THREE.PointsMaterial({ size: 1, color: 0xffffff });
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        rotationGroup.add(stars);
+
+        // Lightning particle effects
+        const lightningMaterial = new THREE.LineBasicMaterial({ color: 0xffffe6, linewidth: 1 });
+        const lightnings = [];
+        const maxLightningAge = 20;
+
+        function createLightning(start, end) {
+            const points = [];
+            const segments = 20;
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const pos = start.clone().lerp(end, t);
+                if (i > 0 && i < segments) {
+                    const jitter = 0.6 * (Math.sin(i * 0.5) + 1);
+                    pos.x += (Math.random() - 0.5) * jitter;
+                    pos.y += (Math.random() - 0.5) * jitter;
+                    pos.z += (Math.random() - 0.5) * jitter;
+                }
+                points.push(pos);
+            }
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const line = new THREE.Line(geometry, lightningMaterial);
+            line.age = 0;
+            rotationGroup.add(line);
+            lightnings.push(line);
+        }
+
+        // Neighbor directions
+        const directions = [
+            { dx: 0, dy: 1, dz: 0 },
+            { dx: 0, dy: -1, dz: 0 },
+            { dx: -1, dy: 0, dz: 0 },
+            { dx: 1, dy: 0, dz: 0 },
+            { dx: 0, dy: 0, dz: 1 },
+            { dx: 0, dy: 0, dz: -1 }
+        ];
+
+        function spawnLightning() {
+            const cube = cubePositions[Math.floor(Math.random() * cubePositions.length)];
+            const { x, y, z, pos } = cube;
+            const dir = directions[Math.floor(Math.random() * directions.length)];
+            const nx = x + dir.dx;
+            const ny = y + dir.dy;
+            const nz = z + dir.dz;
+
+            if (nx >= 0 && nx < cubeSize && ny >= 0 && ny < cubeSize && nz >= 0 && nz < cubeSize) {
+                const neighborIdx = nx * cubeSize * cubeSize + ny * cubeSize + nz;
+                const neighborPos = cubePositions[neighborIdx].pos;
+                createLightning(pos, neighborPos);
+            }
+        }
+
+        // Slower rotation speed for auto-rotation
+        const rotationSpeed = {
+            x: (Math.random() - 0.5) * 0.005,
+            y: (Math.random() - 0.5) * 0.005,
+            z: (Math.random() - 0.5) * 0.005
+        };
+
+        // Mouse/touch controls
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        renderer.domElement.addEventListener('mousedown', (event) => {
+            isDragging = true;
+            previousMousePosition = { x: event.clientX, y: event.clientY };
+        });
+
+        renderer.domElement.addEventListener('mousemove', (event) => {
+            if (isDragging) {
+                const deltaMove = {
+                    x: event.clientX - previousMousePosition.x,
+                    y: event.clientY - previousMousePosition.y
+                };
+                rotationGroup.rotation.y += deltaMove.x * 0.005;
+                rotationGroup.rotation.x += deltaMove.y * 0.005;
+                previousMousePosition = { x: event.clientX, y: event.clientY };
+            }
+        });
+
+        renderer.domElement.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        renderer.domElement.addEventListener('touchstart', (event) => {
+            if (event.touches.length === 1) {
+                isDragging = true;
+                previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+            }
+        });
+
+        renderer.domElement.addEventListener('touchmove', (event) => {
+            if (isDragging && event.touches.length === 1) {
+                const deltaMove = {
+                    x: event.touches[0].clientX - previousMousePosition.x,
+                    y: event.touches[0].clientY - previousMousePosition.y
+                };
+                rotationGroup.rotation.y += deltaMove.x * 0.005;
+                rotationGroup.rotation.x += deltaMove.y * 0.005;
+                previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+            }
+        });
+
+        renderer.domElement.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // Animation loop
+        let frame = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Auto-rotate when not dragging
+            if (!isDragging) {
+                rotationGroup.rotation.x += rotationSpeed.x;
+                rotationGroup.rotation.y += rotationSpeed.y;
+                rotationGroup.rotation.z += rotationSpeed.z;
+            }
+
+            // Spawn lightning
+            if (frame % 1 === 0) {
+                for (let i = 0; i < 50; i++) {
+                    spawnLightning();
+                }
+            }
+
+            // Update and remove lightning
+            for (let i = lightnings.length - 1; i >= 0; i--) {
+                const lightning = lightnings[i];
+                lightning.age++;
+                if (lightning.age > maxLightningAge) {
+                    rotationGroup.remove(lightning);
+                    lightning.geometry.dispose();
+                    lightnings.splice(i, 1);
+                } else {
+                    lightning.material.opacity = 1 - lightning.age / maxLightningAge;
+                }
+            }
+
+            frame++;
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            updateCamera();
+        });
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>

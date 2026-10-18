@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saylor Cinema</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+    
+    <meta property="og:title" content="Saylor Cinema">
+    <meta property="og:description" content="Michael Saylor Art">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ladoger.art">
+    <meta property="og:image" content="https://ladoger.art/1200-600.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="600">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Saylor Cinema">
+    <meta name="twitter:description" content="Michael Saylor Art">
+    <meta name="twitter:image" content="https://ladoger.art/1200-600.jpg">
+    <meta name="twitter:site" content="@LaDoger">
+
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: black;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        .content-wrapper {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            margin: 0;
+            text-align: center;
+            width: 100%;
+            color: white;
+            font-family: 'Lexend', sans-serif;
+            font-weight: bold;
+            letter-spacing: -0.1em;
+            font-size: 3em;
+        }
+        h2 {
+            margin: 0 0 10px 0;
+            text-align: center;
+            width: 100%;
+            font-size: 1em;
+            font-weight: normal;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        h2 a {
+            color: #FA660F;
+            text-decoration: none;
+        }
+        .gallery-container {
+            width: 100%;
+            max-width: 540px;
+            box-sizing: border-box;
+            margin: 0 auto;
+        }
+        .gallery {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 0;
+            margin-top: 2px;
+            box-sizing: border-box;
+            gap: 5px;
+        }
+        .gallery img, .gallery video {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .video-wrap {
+            position: relative;
+        }
+        @media (hover: hover) {
+            .video-wrap::after {
+                content: '';
+                position: absolute;
+                bottom: 14px;
+                left: 14px;
+                width: 36px;
+                height: 36px;
+                background: rgba(0, 0, 0, 0.6);
+                border-radius: 50%;
+                pointer-events: none;
+                transition: opacity 0.2s;
+            }
+            .video-wrap::before {
+                content: '';
+                position: absolute;
+                bottom: 26px;
+                left: 28px;
+                width: 0;
+                height: 0;
+                border-style: solid;
+                border-width: 6px 0 6px 10px;
+                border-color: transparent transparent transparent white;
+                pointer-events: none;
+                z-index: 1;
+                transition: opacity 0.2s;
+            }
+            .video-wrap.playing::after,
+            .video-wrap.playing::before {
+                opacity: 0;
+            }
+            .volume-btn {
+                position: absolute;
+                bottom: 14px;
+                right: 14px;
+                width: 36px;
+                height: 36px;
+                background: rgba(0, 0, 0, 0.6);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                opacity: 0;
+                transition: opacity 0.2s;
+                z-index: 2;
+            }
+            .video-wrap.playing .volume-btn {
+                opacity: 1;
+            }
+            .volume-btn svg {
+                width: 16px;
+                height: 16px;
+                fill: white;
+            }
+            .progress-bar {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 15px;
+                cursor: pointer;
+                z-index: 3;
+                opacity: 0;
+                transition: opacity 0.2s;
+                display: flex;
+                align-items: flex-end;
+            }
+            .video-wrap.playing .progress-bar {
+                opacity: 1;
+            }
+            .progress-bar-track {
+                width: 100%;
+                height: 3px;
+                background: rgba(255, 255, 255, 0.3);
+                transition: height 0.15s;
+            }
+            .progress-bar:hover .progress-bar-track {
+                height: 7px;
+            }
+            .progress-bar-fill {
+                height: 100%;
+                width: 0%;
+                background: #FA660F;
+                pointer-events: none;
+                transition: width 0.25s linear;
+            }
+        }
+        @media (hover: hover) {
+            .gallery video {
+                cursor: pointer;
+            }
+        }
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 1em;
+            margin-top: auto;
+            background-color: black;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        footer a {
+            color: #FA660F;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 0;
+            }
+            .gallery-container {
+                width: 100%;
+            }
+        }
+    </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PFS6XG5M9V"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-PFS6XG5M9V');
+    </script>
+</head>
+
+<body>
+<div class="content-wrapper">
+    <h1>Saylor Cinema</h1>
+    <h2>These amazing <a href="https://x.com/saylor" target="_blank" rel="noopener"><b>Michael Saylor</b></a> art are<br>meant to be spread everywhere!<br><b>Use them well.</b></h2>
+
+    <div class="gallery-container">
+        <div class="gallery" id="gallery"></div>
+    </div>
+
+    <footer>
+        Made by <a href="https://x.com/LaDoger" target="_blank" rel="noopener"><b>@LaDoger</b></a>
+    </footer>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const gallery = document.getElementById('gallery');
+        // Media (images/videos) is served from Cloudflare R2, not from this repo.
+        const MEDIA_BASE = 'https://media.ladoger.art/';
+        
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    if (el.tagName === 'IMG') {
+                        el.src = el.dataset.src;
+                    } else if (el.tagName === 'VIDEO') {
+                        if (el.dataset.poster) el.poster = el.dataset.poster;
+                        if (el.dataset.src) {
+                            el.src = el.dataset.src;
+                            el.preload = 'metadata';
+                        }
+                    }
+                    observer.unobserve(el);
+                }
+            });
+        }, { rootMargin: '400px' });
+
+        // Disable right-click/long-press globally
+        // document.body.addEventListener('contextmenu', (e) => {
+        //    e.preventDefault();
+        // });
+
+        let previewUnmuted = false;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        Promise.all([
+            fetch('pinned.txt').then(r => r.text()).catch(() => ''),
+            fetch('images.txt').then(r => r.text())
+        ]).then(([pinnedData, imagesData]) => {
+                let pinnedNames = pinnedData.trim().split(/\r?\n/).filter(n => n.trim() !== '');
+                const pinnedSet = new Set(pinnedNames);
+                let imageNames = imagesData.trim().split(/\r?\n/).filter(name => name.trim() !== '' && !pinnedSet.has(name.trim()));
+
+                // Shuffle both groups independently; pinned still shows first
+                pinnedNames = shuffleArray(pinnedNames);
+                imageNames = shuffleArray(imageNames);
+
+                // Pinned first, then shuffled
+                const allNames = [...pinnedNames, ...imageNames];
+
+                // Load images
+                allNames.forEach((name, index) => {
+                    const isVideo = name.match(/\.(mp4|mov|webm|mkv|avi)$/i);
+                    let element;
+                    const mediaSrc = `${MEDIA_BASE}images/${name}`;
+
+                    if (isVideo) {
+                        const wrap = document.createElement('div');
+                        wrap.className = 'video-wrap';
+
+                        element = document.createElement('video');
+                        element.loop = true;
+                        element.playsInline = true;
+                        element.style.cursor = 'pointer';
+                        const posterSrc = `${MEDIA_BASE}images/${name.substring(0, name.lastIndexOf('.'))}.jpg`;
+
+                        if (index < pinnedNames.length) {
+                            element.poster = posterSrc;
+                            element.src = mediaSrc;
+                            element.preload = 'metadata';
+                        } else if (index < 3) {
+                            element.poster = posterSrc;
+                            element.src = mediaSrc;
+                            element.preload = 'none';
+                        } else {
+                            element.preload = 'none';
+                            element.dataset.poster = posterSrc;
+                            element.dataset.src = mediaSrc;
+                            observer.observe(element);
+                        }
+
+                        const hasHover = window.matchMedia('(hover: hover)').matches;
+
+                        if (hasHover) {
+                            const volumeBtn = document.createElement('div');
+                            volumeBtn.className = 'volume-btn';
+                            const iconMuted = '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 003.69-1.81L18.73 21 20 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
+                            const iconUnmuted = '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+                            volumeBtn.innerHTML = iconMuted;
+                            volumeBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                element.muted = !element.muted;
+                                previewUnmuted = !element.muted;
+                                volumeBtn.innerHTML = element.muted ? iconMuted : iconUnmuted;
+                            });
+                            wrap.appendChild(volumeBtn);
+
+                            const progressBar = document.createElement('div');
+                            progressBar.className = 'progress-bar';
+                            const progressTrack = document.createElement('div');
+                            progressTrack.className = 'progress-bar-track';
+                            const progressFill = document.createElement('div');
+                            progressFill.className = 'progress-bar-fill';
+                            progressTrack.appendChild(progressFill);
+                            progressBar.appendChild(progressTrack);
+                            progressBar.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                if (!isFinite(element.duration) || element.duration <= 0) return;
+                                const rect = progressBar.getBoundingClientRect();
+                                const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+                                element.currentTime = ratio * element.duration;
+                            });
+                            wrap.appendChild(progressBar);
+                            element.addEventListener('timeupdate', () => {
+                                if (!isFinite(element.duration) || element.duration <= 0) return;
+                                progressFill.style.width = `${(element.currentTime / element.duration) * 100}%`;
+                            });
+
+                            const onEnter = () => {
+                                element.muted = !previewUnmuted;
+                                volumeBtn.innerHTML = previewUnmuted ? iconUnmuted : iconMuted;
+                                element.play().catch(() => {});
+                                wrap.classList.add('playing');
+                            };
+                            const onLeave = () => {
+                                element.pause();
+                                element.currentTime = 0;
+                                element.muted = false;
+                                element.controls = false;
+                                wrap.classList.remove('playing');
+                                progressFill.style.width = '0%';
+                            };
+                            wrap.addEventListener('mouseenter', onEnter);
+                            wrap.addEventListener('mouseleave', onLeave);
+                            element.addEventListener('click', () => {
+                                // If already in fullscreen, let native controls handle it
+                                if (document.fullscreenElement || document.webkitFullscreenElement) return;
+                                // Remove hover listeners so fullscreen transition doesn't retrigger them
+                                wrap.removeEventListener('mouseenter', onEnter);
+                                wrap.removeEventListener('mouseleave', onLeave);
+                                element.muted = false;
+                                element.controls = true;
+                                element.currentTime = 0;
+                                element.play().catch(() => {});
+                                wrap.classList.add('playing');
+                                if (element.webkitEnterFullscreen) {
+                                    element.webkitEnterFullscreen();
+                                } else if (element.requestFullscreen) {
+                                    element.requestFullscreen();
+                                } else if (wrap.requestFullscreen) {
+                                    wrap.requestFullscreen();
+                                }
+                            });
+
+                            // Reset to preview state when exiting fullscreen
+                            const onFullscreenExit = () => {
+                                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                                    element.pause();
+                                    element.currentTime = 0;
+                                    element.muted = false;
+                                    element.controls = false;
+                                    wrap.classList.remove('playing');
+                                    // Restore hover listeners
+                                    wrap.addEventListener('mouseenter', onEnter);
+                                    wrap.addEventListener('mouseleave', onLeave);
+                                }
+                            };
+                            document.addEventListener('fullscreenchange', onFullscreenExit);
+                            document.addEventListener('webkitfullscreenchange', onFullscreenExit);
+                        } else {
+                            element.controls = true;
+                        }
+
+                        wrap.appendChild(element);
+                        gallery.appendChild(wrap);
+                        return; // skip the gallery.appendChild below
+
+                    } else {
+                        element = document.createElement('img');
+                        element.alt = "Michael Saylor Portrait";
+
+                        if (index < 3) {
+                            element.src = mediaSrc;
+                            if (index === 0) element.fetchPriority = 'high';
+                        } else {
+                            element.dataset.src = mediaSrc;
+                            observer.observe(element);
+                        }
+
+                        element.style.cursor = 'pointer';
+                        element.addEventListener('click', () => {
+                            window.open(element.src || element.dataset.src, '_blank');
+                        });
+                    }
+                    
+                    gallery.appendChild(element);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching image list:', error);
+                const errorMsg = document.createElement('p');
+                errorMsg.textContent = 'Error loading gallery.';
+                errorMsg.style.color = 'white';
+                errorMsg.style.textAlign = 'center';
+                gallery.appendChild(errorMsg);
+            });
+    });
+</script>
+</body>
+</html>

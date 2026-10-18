@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Saylor Cinema</title>
+<script>
+  // Media moved to Cloudflare R2 (media.ladoger.art). Send old links like
+  // /images/abc123.jpg, /v1/... and /refs/... to the same path there.
+  (function () {
+    var p = location.pathname;
+    if (/^\/(images|refs|v1)\/.+\.(jpe?g|png|gif|webp|mp4|mov|webm|mp3)$/i.test(p)) {
+      location.replace('https://media.ladoger.art' + p + location.search + location.hash);
+    }
+  })();
+</script>
+<style>body{background:#000;color:#fff;font-family:sans-serif;text-align:center;padding-top:20vh}a{color:#FA660F}</style>
+</head>
+<body>
+<h1>404</h1>
+<p>Page not found. <a href="/">Back to Saylor Cinema</a></p>
+</body>
+</html>
